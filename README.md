@@ -1,268 +1,54 @@
-# Terraform-aws-security-group
+<<p align="center"> <img src="https://user-images.githubusercontent.com/50652676/62349836-882fef80-b51e-11e9-99e3-7b974309c7e3.png" width="100" height="100"></p>
 
-# Terraform AWS Cloud Security-Group Module
 
-## Table of Contents
+<h1 align="center">
+    Terraform AWS  Security-Group
+</h1>
+
+
+<p align="center">
+
+<a href="https://www.terraform.io">
+  <img src="https://img.shields.io/badge/Terraform-v1.7.0-green" alt="Terraform">
+</a>
+<a href="https://github.com/slovink/terraform-aws-security-group/blob/master/LICENSE">
+  <img src="https://img.shields.io/badge/License-APACHE-blue.svg" alt="Licence">
+</a>
+
+
+
+</p>
+<p align="center">
+
+<a href='https://www.facebook.com/Slovink.in=https://github.com/slovink/terraform-aws-security-group '>
+  <img title="Share on Facebook" src="https://user-images.githubusercontent.com/50652676/62817743-4f64cb80-bb59-11e9-90c7-b057252ded50.png" />
+</a>
+<a href='https://www.linkedin.com/company/101534993/admin/feed/posts/=https://github.com/slovink/terraform-aws-security-group '>
+  <img title="Share on LinkedIn" src="https://user-images.githubusercontent.com/50652676/62817742-4e339e80-bb59-11e9-87b9-a1f68cae1049.png" />
+</a>
+
+
+
 - [Introduction](#introduction)
 - [Usage](#usage)
-- [Examples](#Examples)
-- [Author](#Author)
+- [Module Inputs](#module-inputs)
+- [Module Outputs](#module-outputs)
+- [Examples](#examples)
 - [License](#license)
-- [Inputs](#inputs)
-- [Outputs](#outputs)
+
+
+
+## Prerequisites
+
+This module has a few dependencies:
+
+- [Terraform 1.x.x](https://learn.hashicorp.com/terraform/getting-started/install.html)
+- [Go](https://golang.org/doc/install)
+
+
 
 ## Introduction
 This Terraform module creates an AWS security-group along with additional configuration options.
-## Usage
-To use this module, you can include it in your Terraform configuration. Here's an example of how to use it:
-
-## Examples
-
-## Example: Basic
-
-```hcl
-module "security_group" {
-  source      = "./../.././"
-  name        = local.name
-  environment = local.environment
-  vpc_id      = module.vpc.vpc_id
-
-  ## INGRESS Rules
-  new_sg_ingress_rules_with_cidr_blocks = [
-    {
-      rule_count  = 1
-      from_port   = 22
-      to_port     = 22
-      protocol    = "tcp"
-      cidr_blocks = ["172.16.0.0/16"]
-      description = "Allow ssh traffic."
-    },
-    {
-      rule_count  = 2
-      from_port   = 27017
-      to_port     = 27017
-      protocol    = "tcp"
-      cidr_blocks = ["172.16.0.0/16"]
-      description = "Allow MongoDB traffic."
-    }
-  ]
-
-  ## EGRESS Rules
-  new_sg_egress_rules_with_cidr_blocks = [
-    {
-      rule_count  = 1
-      from_port   = 22
-      to_port     = 22
-      protocol    = "tcp"
-      cidr_blocks = ["172.16.0.0/16"]
-      description = "Allow ssh outbound traffic."
-    },
-    {
-      rule_count  = 2
-      from_port   = 27017
-      to_port     = 27017
-      protocol    = "tcp"
-      cidr_blocks = ["172.16.0.0/16"]
-      description = "Allow MongoDB outbound traffic."
-    }
-  ]
-}
-```
-
-## Example: Complete
-```hcl
-module "security_group" {
-  source      = "./../.././"
-  name        = local.name
-  environment = local.environment
-  vpc_id      = module.vpc.vpc_id
-
-  ## INGRESS Rules
-  new_sg_ingress_rules_with_cidr_blocks = [{
-    rule_count  = 1
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["172.16.0.0/16"]
-    description = "Allow ssh traffic."
-    },
-    {
-      rule_count  = 2
-      from_port   = 27017
-      to_port     = 27017
-      protocol    = "tcp"
-      cidr_blocks = ["172.16.0.0/16"]
-      description = "Allow Mongodb traffic."
-    }
-  ]
-
-  new_sg_ingress_rules_with_self = [{
-    rule_count  = 1
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    description = "Allow ssh traffic."
-    },
-    {
-      rule_count  = 2
-      from_port   = 27017
-      to_port     = 22
-      protocol    = "tcp"
-      description = "Allow Mongodb traffic."
-    }
-  ]
-
-  new_sg_ingress_rules_with_source_sg_id = [{
-    rule_count               = 1
-    from_port                = 22
-    to_port                  = 22
-    protocol                 = "tcp"
-    source_security_group_id = "sg-03de2036c5096cb34"
-    description              = "Allow ssh traffic."
-    },
-    {
-      rule_count               = 2
-      from_port                = 27017
-      to_port                  = 27017
-      protocol                 = "tcp"
-      source_security_group_id = "sg-03de2036c5096cb34"
-      description              = "Allow Mongodb traffic."
-  }]
-
-  ## EGRESS Rules
-  new_sg_egress_rules_with_cidr_blocks = [{
-    rule_count  = 1
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [module.vpc.vpc_cidr_block, "172.16.0.0/16"]
-    description = "Allow ssh outbound traffic."
-    },
-    {
-      rule_count  = 2
-      from_port   = 27017
-      to_port     = 27017
-      protocol    = "tcp"
-      cidr_blocks = ["172.16.0.0/16"]
-      description = "Allow Mongodb outbound traffic."
-    }
-  ]
-
-  new_sg_egress_rules_with_self = [{
-    rule_count  = 1
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    description = "Allow ssh outbound traffic."
-    },
-    {
-      rule_count  = 2
-      from_port   = 27017
-      to_port     = 27017
-      protocol    = "tcp"
-      description = "Allow Mongodb traffic."
-  }]
-
-  new_sg_egress_rules_with_source_sg_id = [{
-    rule_count               = 1
-    from_port                = 22
-    to_port                  = 22
-    protocol                 = "tcp"
-    source_security_group_id = "sg-03de2036c5096cb34"
-    description              = "Allow ssh outbound traffic."
-    },
-    {
-      rule_count               = 2
-      from_port                = 27017
-      to_port                  = 27017
-      protocol                 = "tcp"
-      source_security_group_id = "sg-03de2036c5096cb34"
-      description              = "Allow Mongodb traffic."
-  }]
-}
-```
-
-## Example: Only_rules
-
-```hcl
-module "security_group_rules" {
-  source         = "./../../."
-  name           = local.name
-  environment    = local.environment
-  vpc_id         = module.vpc.vpc_id
-  new_sg         = false
-  existing_sg_id = "sg-0c6f081b520533c20"
-
-  ## INGRESS Rules
-  existing_sg_ingress_rules_with_cidr_blocks = [{
-    rule_count  = 1
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["10.9.0.0/16"]
-    description = "Allow ssh traffic."
-    },
-    {
-      rule_count  = 2
-      from_port   = 27017
-      to_port     = 27017
-      protocol    = "tcp"
-      cidr_blocks = ["10.9.0.0/16"]
-      description = "Allow Mongodb traffic."
-    }
-  ]
-
-  ## EGRESS Rules
-  existing_sg_egress_rules_with_cidr_blocks = [{
-    rule_count  = 1
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["10.9.0.0/16"]
-    description = "Allow ssh outbound traffic."
-    },
-    {
-      rule_count  = 2
-      from_port   = 27017
-      to_port     = 27017
-      protocol    = "tcp"
-      cidr_blocks = ["10.9.0.0/16"]
-      description = "Allow Mongodb outbound traffic."
-  }]
-}
-```
-
-## Example: Prefix_list
-
-```hcl
-module "security_group" {
-  source              = "./../../."
-  name                = local.name
-  environment         = local.environment
-  vpc_id              = module.vpc.vpc_id
-  prefix_list_enabled = true
-  entry = [{
-    cidr = "10.19.0.0/16"
-  }]
-
-  ## INGRESS Rules
-  new_sg_ingress_rules_with_prefix_list = [{
-    rule_count  = 1
-    allow_port  = 22
-    to_port     = 22
-    protocol    = "tcp"
-    description = "Allow ssh traffic."
-  }]
-
-  ## EGRESS Rules
-  new_sg_egress_rules_with_prefix_list = [{
-    rule_count  = 1
-    allow_port  = 3306
-    protocol    = "tcp"
-    description = "Allow mysql/aurora outbound traffic."
-  }]
-}
-```
 
 ## Examples
 For detailed examples on how to use this module, please refer to the [Examples](https://github.com/slovink/terraform-aws-security-group/tree/master/example) directory within this repository.
