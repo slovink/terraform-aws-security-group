@@ -275,9 +275,9 @@ Here is an example of how you can use this module in your inventory structure:
      }
    ```
 
-    ### Simple Example:- prefix_list
-    Here is an example of how you can use this module in your inventory structure:
-    ```hcl
+### Simple Example:- prefix_list
+Here is an example of how you can use this module in your inventory structure:
+   ```hcl
       module "security_group" {
         source              = "https://github.com/slovink/terraform-aws-security-group.git?ref=v1.0.0"
         name                = local.name
