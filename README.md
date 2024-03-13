@@ -59,6 +59,260 @@ Your Name Replace **MIT** and **slovink** with the appropriate license and your 
 ## License
 This project is licensed under the **MIT** License - see the [LICENSE](https://github.com/slovink/terraform-aws-security-group/blob/master/LICENSE) file for details.
 
+
+### Simple Example
+Here is an example of how you can use this module in your inventory structure:
+  ```hcl
+
+     module "security_group" {
+        source      = "https://github.com/slovink/terraform-aws-security-group.git?ref=v1.0.0"
+        name        = local.name
+        environment = local.environment
+        vpc_id      = module.vpc.id
+
+        ## INGRESS Rules
+        new_sg_ingress_rules_with_cidr_blocks = [{
+          rule_count  = 1
+          from_port   = 22
+          to_port     = 22
+          protocol    = "tcp"
+          cidr_blocks = ["172.16.0.0/16"]
+          description = "Allow ssh traffic."
+          },
+          {
+            rule_count  = 2
+            from_port   = 27017
+            to_port     = 27017
+            protocol    = "tcp"
+            cidr_blocks = ["172.16.0.0/16"]
+            description = "Allow Mongodb traffic."
+          }
+        ]
+
+        ## EGRESS Rules
+        new_sg_egress_rules_with_cidr_blocks = [{
+          rule_count  = 1
+          from_port   = 22
+          to_port     = 22
+          protocol    = "tcp"
+          cidr_blocks = ["172.16.0.0/16"]
+          description = "Allow ssh outbound traffic."
+          },
+          {
+            rule_count  = 2
+            from_port   = 27017
+            to_port     = 27017
+            protocol    = "tcp"
+            cidr_blocks = ["172.16.0.0/16"]
+            description = "Allow Mongodb outbound traffic."
+          }
+        ]
+     }
+  ```
+
+### Simple Example:- complete
+Here is an example of how you can use this module in your inventory structure:
+  ```hcl
+     module "security_group" {
+       source      = "https://github.com/slovink/terraform-aws-security-group.git?ref=v1.0.0"
+       name        = local.name
+       environment = local.environment
+       vpc_id      = module.vpc.id
+
+       ## INGRESS Rules
+       new_sg_ingress_rules_with_cidr_blocks = [{
+         rule_count  = 1
+         from_port   = 22
+         to_port     = 22
+         protocol    = "tcp"
+         cidr_blocks = ["172.16.0.0/16"]
+         description = "Allow ssh traffic."
+         },
+         {
+           rule_count  = 2
+           from_port   = 27017
+           to_port     = 27017
+           protocol    = "tcp"
+           cidr_blocks = ["172.16.0.0/16"]
+           description = "Allow Mongodb traffic."
+         }
+       ]
+
+       new_sg_ingress_rules_with_self = [{
+         rule_count  = 1
+         from_port   = 22
+         to_port     = 22
+         protocol    = "tcp"
+         description = "Allow ssh traffic."
+         },
+         {
+           rule_count  = 2
+           from_port   = 443
+           to_port     = 443
+           protocol    = "tcp"
+           description = "Allow Mongodbn traffic."
+         }
+       ]
+
+       new_sg_ingress_rules_with_source_sg_id = [{
+         rule_count               = 1
+         from_port                = 22
+         to_port                  = 22
+         protocol                 = "tcp"
+         source_security_group_id = "sg-xxxxxxxxxxxx"
+         description              = "Allow ssh traffic."
+         },
+         {
+           rule_count               = 2
+           from_port                = 27017
+           to_port                  = 27017
+           protocol                 = "tcp"
+           source_security_group_id = "sg-xxxxxxxxxxxxxxxx"
+           description              = "Allow Mongodb traffic."
+       }]
+
+       ## EGRESS Rules
+       new_sg_egress_rules_with_cidr_blocks = [{
+         rule_count  = 1
+         from_port   = 22
+         to_port     = 22
+         protocol    = "tcp"
+         cidr_blocks = [module.vpc.vpc_cidr_block, "172.16.0.0/16"]
+         description = "Allow ssh outbound traffic."
+         },
+         {
+           rule_count  = 2
+           from_port   = 27017
+           to_port     = 27017
+           protocol    = "tcp"
+           cidr_blocks = ["172.16.0.0/16"]
+           description = "Allow Mongodb outbound traffic."
+         }
+       ]
+
+       new_sg_egress_rules_with_self = [{
+         rule_count  = 1
+         from_port   = 22
+         to_port     = 22
+         protocol    = "tcp"
+         description = "Allow ssh outbound traffic."
+         },
+         {
+           rule_count  = 2
+           from_port   = 27017
+           to_port     = 27017
+           protocol    = "tcp"
+           description = "Allow Mongodb traffic."
+       }]
+
+       new_sg_egress_rules_with_source_sg_id = [{
+         rule_count               = 1
+         from_port                = 22
+         to_port                  = 22
+         protocol                 = "tcp"
+         source_security_group_id = "sg-xxxxxxxxxxx"
+         description              = "Allow ssh outbound traffic."
+         },
+         {
+           rule_count               = 2
+           from_port                = 27017
+           to_port                  = 27017
+           protocol                 = "tcp"
+           source_security_group_id = "sg-xxxxxxxxxx"
+           description              = "Allow Mongodb traffic."
+       }]
+     }
+  ```
+
+### Simple Example:- only_rules
+Here is an example of how you can use this module in your inventory structure:
+   ```hcl
+     module "security_group_rules" {
+       source         = "https://github.com/slovink/terraform-aws-security-group.git?ref=v1.0.0"
+       name           = local.name
+       environment    = local.environment
+       vpc_id         = module.vpc.id
+       new_sg         = false
+       existing_sg_id = "sg-xxxxxxxxxxxxx"
+
+       ## INGRESS Rules
+       existing_sg_ingress_rules_with_cidr_blocks = [{
+         rule_count  = 1
+         from_port   = 22
+         to_port     = 22
+         protocol    = "tcp"
+         cidr_blocks = ["10.9.0.0/16"]
+         description = "Allow ssh traffic."
+         },
+         {
+           rule_count  = 2
+           from_port   = 27017
+           to_port     = 27017
+           protocol    = "tcp"
+           cidr_blocks = ["10.9.0.0/16"]
+           description = "Allow Mongodb traffic."
+         }
+       ]
+
+       ## EGRESS Rules
+       existing_sg_egress_rules_with_cidr_blocks = [{
+         rule_count  = 1
+         from_port   = 22
+         to_port     = 22
+         protocol    = "tcp"
+         cidr_blocks = ["10.9.0.0/16"]
+         description = "Allow ssh outbound traffic."
+         },
+         {
+           rule_count  = 2
+           from_port   = 27017
+           to_port     = 27017
+           protocol    = "tcp"
+           cidr_blocks = ["10.9.0.0/16"]
+           description = "Allow Mongodb outbound traffic."
+       }]
+
+     }
+   ```
+
+    ### Simple Example:- prefix_list
+    Here is an example of how you can use this module in your inventory structure:
+    ```hcl
+      module "security_group" {
+        source              = "https://github.com/slovink/terraform-aws-security-group.git?ref=v1.0.0"
+        name                = local.name
+        environment         = local.environment
+        vpc_id              = module.vpc.id
+        prefix_list_enabled = true
+        entry = [{
+          cidr = "10.19.0.0/16"
+        }]
+
+        ## INGRESS Rules
+        new_sg_ingress_rules_with_prefix_list = [{
+          rule_count  = 1
+          from_port   = 22
+          to_port     = 22
+          protocol    = "tcp"
+          description = "Allow ssh traffic."
+          }
+        ]
+
+        ## EGRESS Rules
+        new_sg_egress_rules_with_prefix_list = [{
+          rule_count  = 1
+          from_port   = 3306
+          to_port     = 3306
+          protocol    = "tcp"
+          description = "Allow mysql/aurora outbound traffic."
+          }
+        ]
+      }
+    ```
+
+
+
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
